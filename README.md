@@ -4,8 +4,7 @@
 [![NIST AI RMF](https://img.shields.io/badge/NIST%20AI%20RMF-Aligned-0055A4?style=flat-square)](https://airc.nist.gov/home)
 [![Discussions](https://img.shields.io/badge/Discussions-Join-7289da?style=flat-square&logo=github)](https://github.com/simaba/agent-eval/discussions)
 
-A structured framework for evaluating AI agents across task performance, safety,
-reliability, and governance dimensions — designed for regulated industry deployment.
+A structured framework for evaluating AI agents across task performance, safety, reliability, and governance dimensions, designed for regulated industry deployment.
 
 ---
 
@@ -127,9 +126,9 @@ Key alignment:
 
 | Repository | Purpose |
 |---|---|
-| [agent-system-simulator](https://github.com/simaba/agent-simulator) | Simulate agent behavior for evaluation |
-| [multi-agent-governance-framework](https://github.com/simaba/multi-agent-governance) | Governance for multi-agent systems |
-| [model-evaluation-framework](https://github.com/simaba/model-evaluation-framework) | Broader ML model evaluation |
-| [nist-ai-rmf-implementation-guide](https://github.com/simaba/nist-rmf-guide) | NIST AI RMF guide |
+| [agent-simulator](https://github.com/simaba/agent-simulator) | Simulate agent behavior for evaluation |
+| [multi-agent-governance](https://github.com/simaba/multi-agent-governance) | Governance for multi-agent systems |
+| [agent-orchestration](https://github.com/simaba/agent-orchestration) | Orchestration patterns and failure handling |
+| [nist-rmf-guide](https://github.com/simaba/nist-rmf-guide) | NIST AI RMF guide |
 
 *Maintained by [Sima Bagheri](https://github.com/simaba) · Connect on [LinkedIn](https://www.linkedin.com/in/simaba/)*
