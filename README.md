@@ -128,7 +128,8 @@ Key alignment:
 |---|---|
 | [agent-simulator](https://github.com/simaba/agent-simulator) | Simulate agent behavior for evaluation |
 | [multi-agent-governance](https://github.com/simaba/multi-agent-governance) | Governance for multi-agent systems |
-| [agent-orchestration](https://github.com/simaba/agent-orchestration) | Orchestration patterns and failure handling |
-| [nist-rmf-guide](https://github.com/simaba/nist-rmf-guide) | NIST AI RMF guide |
+| [agent-orchestration](https://github.com/simaba/agent-orchestration) | Orchestration patterns and control flow design |
+| [nist-rmf-guide](https://github.com/simaba/nist-rmf-guide) | NIST AI RMF practitioner guide |
+| [governance-playbook](https://github.com/simaba/governance-playbook) | Broader enterprise governance operating model |
 
 *Maintained by [Sima Bagheri](https://github.com/simaba) · Connect on [LinkedIn](https://www.linkedin.com/in/simaba/)*
