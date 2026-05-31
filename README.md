@@ -1,7 +1,7 @@
 # AI Agent Evaluation Framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![NIST AI RMF](https://img.shields.io/badge/NIST%20AI%20RMF-Aligned-0055A4?style=flat-square)](https://airc.nist.gov/home)
+[![NIST AI RMF](https://img.shields.io/badge/NIST%20AI%20RMF-Informed-0055A4?style=flat-square)](https://airc.nist.gov/home)
 [![Discussions](https://img.shields.io/badge/Discussions-Join-7289da?style=flat-square&logo=github)](https://github.com/simaba/agent-eval/discussions)
 
 A structured framework for evaluating AI agents across task performance, safety, reliability, and governance dimensions, designed for regulated-industry deployment.
@@ -23,6 +23,12 @@ Do **not** start here if you need the oversight model. Use [`multi-agent-governa
 Do **not** start here if you need orchestration patterns. Use [`agent-orchestration`](https://github.com/simaba/agent-orchestration).
 
 Do **not** start here if you want runnable behavior. Use [`agent-simulator`](https://github.com/simaba/agent-simulator).
+
+---
+
+## Maturity
+
+This is a **practitioner evaluation framework**, not a certified benchmark suite. The metrics and targets are intended as starting points for structured evaluation. Real deployments should adapt thresholds to the domain, risk tier, user population, applicable regulation, and operational failure tolerance.
 
 ---
 
@@ -51,21 +57,21 @@ Do **not** start here if you want runnable behavior. Use [`agent-simulator`](htt
 
 ### 2. Safety and reliability
 
-| Metric | Description | Target |
+| Metric | Description | Example target |
 |---|---|---|
-| **Hallucination Rate** | factually incorrect statements in outputs | < 2% on factual tasks |
-| **Harmful Output Rate** | outputs violating safety guidelines | 0% hard limit |
-| **Refusal Appropriateness** | correct refusal of inappropriate requests | > 95% |
+| **Hallucination Rate** | factually incorrect statements in outputs | < 2% on factual tasks, adjusted by risk tier |
+| **Harmful Output Rate** | outputs violating safety guidelines | 0% hard limit for critical harms |
+| **Refusal Appropriateness** | correct refusal of inappropriate requests | > 95%, adjusted by policy scope |
 | **Prompt Injection Resistance** | resistance to adversarial inputs | tested via red-team suite |
-| **Consistency** | same input produces the same output class | > 90% across repeated runs |
+| **Consistency** | same input produces the same output class | > 90% across repeated runs, adjusted by task type |
 
 ### 3. Operational reliability
 
-| Metric | Description | Target |
+| Metric | Description | Example target |
 |---|---|---|
-| **Availability** | uptime under normal and peak load | ≥ 99.5% |
+| **Availability** | uptime under normal and peak load | ≥ 99.5%, adjusted by service criticality |
 | **P99 Latency** | 99th-percentile response time | ≤ configured SLA |
-| **Error Rate** | % of requests ending in unhandled errors | < 0.1% |
+| **Error Rate** | % of requests ending in unhandled errors | < 0.1%, adjusted by workload |
 | **Cost per Task** | token cost per successful task | tracked against budget |
 | **Graceful Degradation** | behavior when tools or dependencies fail | tested via fault injection |
 
@@ -73,11 +79,38 @@ Do **not** start here if you want runnable behavior. Use [`agent-simulator`](htt
 
 | Metric | Description | Pass Criterion |
 |---|---|---|
-| **Decision Traceability** | can every output be traced to inputs and reasoning? | full trace available |
-| **Tool Call Logging** | all external tool calls logged with parameters | 100% logged |
+| **Decision Traceability** | can every output be traced to inputs and decision evidence? | full trace available |
+| **Tool Call Logging** | all external tool calls logged with parameters | 100% logged, with sensitive data controls |
 | **Human Escalation Rate** | % of tasks escalated to human review | tracked with threshold defined |
-| **Sensitive Data Handling** | PII or sensitive data not leaked in outputs or logs | 0 violations |
+| **Sensitive Data Handling** | PII or sensitive data not leaked in outputs or logs | 0 critical violations |
 | **Override Capability** | operator can halt or override agent behavior | verified in testing |
+
+---
+
+## Evaluation protocol
+
+The target numbers above should not be treated as universal pass/fail thresholds. Use this protocol to make evaluations more defensible.
+
+| Protocol element | Recommended practice |
+|---|---|
+| Scenario set | Include normal, ambiguous, adversarial, tool-failure, escalation, and out-of-distribution tasks |
+| Sample size | Define the minimum number of tasks per scenario class before testing starts |
+| Risk tiering | Use stricter thresholds for safety-critical, regulated, or irreversible decisions |
+| Repeated runs | Run the same scenario multiple times when model nondeterminism matters |
+| Human adjudication | Use expert review for high-impact failures, disputed LLM-judge results, and policy-boundary cases |
+| Severity levels | Classify findings as minor, major, critical, or blocker |
+| Confidence | Report uncertainty, small sample caveats, and known benchmark limitations |
+| Regression testing | Re-run the suite after model, prompt, tool, retrieval, or policy changes |
+| Evidence retention | Store prompts, inputs, outputs, tool traces, evaluator notes, and sign-off decisions with appropriate data controls |
+
+### Suggested release decision logic
+
+| Decision | Use when |
+|---|---|
+| **Approve** | No blockers, critical controls pass, residual risks accepted by named owners |
+| **Approve with conditions** | Minor or moderate issues exist but mitigations and monitoring are defined |
+| **Hold** | Major issues require fixes before release |
+| **Reject** | Critical safety, privacy, compliance, or operational failures are unresolved |
 
 ---
 
@@ -128,16 +161,24 @@ The schema captures:
 
 ---
 
-## NIST AI RMF alignment
+## NIST AI RMF mapping
 
 Full mapping: [docs/nist-rmf-mapping.md](docs/nist-rmf-mapping.md)
 
-Key alignment:
+Key practitioner mapping:
 
 - **MS.1**: AI risk identification through safety and adversarial scenarios
 - **MS.3**: structured evaluation techniques and benchmark design
 - **MS.5**: subgroup and fairness measurement
 - **GV.4**: human oversight via escalation and override checks
+
+---
+
+## Scope and disclaimer
+
+This repository is shared in a personal capacity. It is not legal advice, compliance certification, regulatory approval, safety certification, benchmark certification, or official guidance from NIST, the EU, ISO, or any employer.
+
+References to NIST AI RMF, EU AI Act, safety controls, or industry obligations are practitioner mappings and examples. Always verify against official sources before using this framework for compliance, safety, or release decisions.
 
 ---
 
