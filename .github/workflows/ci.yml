@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   validate-evaluation-report:
     runs-on: ubuntu-latest
@@ -22,27 +25,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install jsonschema
 
-      - name: Validate sample evaluation report JSON
+      - name: Validate sample evaluation report
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from jsonschema import Draft202012Validator
+          python tools/validate_evaluation_report.py \
+            schemas/evaluation-report.schema.json \
+            examples/sample-evaluation-report.json
 
-          schema_path = Path('schemas/evaluation-report.schema.json')
-          report_path = Path('examples/sample-evaluation-report.json')
-
-          schema = json.loads(schema_path.read_text(encoding='utf-8'))
-          report = json.loads(report_path.read_text(encoding='utf-8'))
-
-          validator = Draft202012Validator(schema)
-          errors = sorted(validator.iter_errors(report), key=lambda e: list(e.path))
-
-          if errors:
-              for error in errors:
-                  location = '.'.join(str(part) for part in error.path) or '<root>'
-                  print(f'{location}: {error.message}')
-              raise SystemExit(1)
-
-          print('Evaluation report JSON is valid.')
-          PY
+      - name: Run semantic validation tests
+        run: python -m unittest discover -s tests -v
