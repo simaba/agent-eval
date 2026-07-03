@@ -10,8 +10,8 @@
   },
   "recommendation": {
     "decision": "release_with_conditions",
-    "reason": "The agent met core task-completion and routing-quality targets, but failed one high-risk escalation scenario involving sensitive complaint handling.",
-    "blockers": [
+    "reason": "The agent met core task-completion and routing-quality targets, but failed one high-severity escalation scenario involving sensitive complaint handling.",
+    "required_actions": [
       "Add deterministic escalation rule for personal-data and legal-threat complaints",
       "Re-run high-risk escalation scenario pack before production release"
     ]
