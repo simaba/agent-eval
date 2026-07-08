@@ -3,7 +3,7 @@
 
 The JSON Schema checks field types and allowed values. This utility adds the
 cross-field rules needed to keep a recommendation, release status, conditions,
-and high-severity findings internally coherent.
+required actions, decision blockers, and material findings internally coherent.
 """
 
 from __future__ import annotations
@@ -50,7 +50,13 @@ def schema_errors(schema: dict[str, Any], report: dict[str, Any]) -> list[str]:
 
 
 def semantic_errors(report: dict[str, Any]) -> list[str]:
-    """Return cross-field consistency errors after schema validation succeeds."""
+    """Return cross-field consistency errors after schema validation succeeds.
+
+    A *severity* states the consequence of a finding. A *blocker* is a decision
+    status: unresolved blockers prevent the current release decision. Required
+    actions may exist on a conditional approval, but they are not blockers once
+    the accountable owners have accepted the bounded conditions.
+    """
     recommendation = report["recommendation"]
     decision = report["decision"]
     recommendation_decision = recommendation["decision"]
@@ -67,30 +73,40 @@ def semantic_errors(report: dict[str, Any]) -> list[str]:
         )
 
     blockers = recommendation.get("blockers", [])
+    required_actions = recommendation.get("required_actions", [])
     conditions = decision["conditions"]
+    severities = [failure["severity"] for failure in report["findings"]["failures"]]
+    has_high = "high" in severities
+    has_critical = "critical" in severities
 
     if recommendation_decision == "release":
         if blockers:
             errors.append("recommendation.decision=release must not include unresolved blockers")
+        if required_actions:
+            errors.append("recommendation.decision=release must not include unresolved required_actions")
         if conditions:
             errors.append("decision.release_status=approved must not include release conditions")
 
     if recommendation_decision == "release_with_conditions":
-        if not blockers:
-            errors.append("release_with_conditions requires at least one stated blocker or required action")
+        if blockers:
+            errors.append(
+                "release_with_conditions is incompatible with unresolved blockers; "
+                "use required_actions and decision.conditions for bounded follow-up"
+            )
+        if not required_actions and not conditions:
+            errors.append(
+                "release_with_conditions requires at least one stated required_action or release condition"
+            )
         if not conditions:
             errors.append("approved_with_conditions requires at least one release condition")
 
-    if recommendation_decision == "do_not_release" and not blockers:
-        errors.append("do_not_release requires at least one stated blocker")
+    if recommendation_decision == "do_not_release" and not blockers and not has_critical:
+        errors.append("do_not_release requires at least one stated blocker or critical finding")
 
-    high_findings = [
-        failure
-        for failure in report["findings"]["failures"]
-        if failure["severity"] == "high"
-    ]
-    if high_findings and recommendation_decision == "release":
+    if has_high and recommendation_decision == "release":
         errors.append("recommendation.decision=release is incompatible with unresolved high-severity findings")
+    if has_critical and recommendation_decision != "do_not_release":
+        errors.append("critical findings require recommendation.decision=do_not_release")
 
     return errors
 

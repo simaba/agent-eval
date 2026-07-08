@@ -27,7 +27,7 @@ class EvaluationReportValidationTests(unittest.TestCase):
     def test_release_cannot_claim_not_approved_status(self) -> None:
         report = copy.deepcopy(self.report)
         report["recommendation"]["decision"] = "release"
-        report["recommendation"].pop("blockers")
+        report["recommendation"].pop("required_actions")
         report["decision"]["release_status"] = "not_approved"
         report["decision"]["conditions"] = []
 
@@ -35,26 +35,54 @@ class EvaluationReportValidationTests(unittest.TestCase):
 
         self.assertTrue(any("requires decision.release_status=approved" in error for error in errors))
 
-    def test_release_with_conditions_requires_conditions_and_blockers(self) -> None:
+    def test_conditional_release_requires_conditions_or_required_actions(self) -> None:
         report = copy.deepcopy(self.report)
-        report["recommendation"].pop("blockers")
+        report["recommendation"].pop("required_actions")
         report["decision"]["conditions"] = []
 
         errors = VALIDATOR.semantic_errors(report)
 
-        self.assertTrue(any("requires at least one stated blocker" in error for error in errors))
+        self.assertTrue(any("requires at least one stated required_action" in error for error in errors))
         self.assertTrue(any("requires at least one release condition" in error for error in errors))
+
+    def test_conditional_release_cannot_claim_unresolved_blockers(self) -> None:
+        report = copy.deepcopy(self.report)
+        report["recommendation"]["blockers"] = ["Resolve the fictional security boundary"]
+
+        errors = VALIDATOR.semantic_errors(report)
+
+        self.assertTrue(any("incompatible with unresolved blockers" in error for error in errors))
 
     def test_release_cannot_ignore_high_severity_finding(self) -> None:
         report = copy.deepcopy(self.report)
         report["recommendation"]["decision"] = "release"
-        report["recommendation"].pop("blockers")
+        report["recommendation"].pop("required_actions")
         report["decision"]["release_status"] = "approved"
         report["decision"]["conditions"] = []
 
         errors = VALIDATOR.semantic_errors(report)
 
         self.assertTrue(any("high-severity findings" in error for error in errors))
+
+    def test_critical_finding_requires_do_not_release(self) -> None:
+        report = copy.deepcopy(self.report)
+        report["findings"]["failures"][0]["severity"] = "critical"
+
+        errors = VALIDATOR.semantic_errors(report)
+
+        self.assertTrue(any("critical findings require" in error for error in errors))
+
+    def test_do_not_release_can_be_supported_by_critical_finding(self) -> None:
+        report = copy.deepcopy(self.report)
+        report["findings"]["failures"][0]["severity"] = "critical"
+        report["recommendation"] = {
+            "decision": "do_not_release",
+            "reason": "A fictional critical boundary failure remains unresolved.",
+        }
+        report["decision"]["release_status"] = "not_approved"
+        report["decision"]["conditions"] = []
+
+        self.assertEqual(VALIDATOR.semantic_errors(report), [])
 
 
 if __name__ == "__main__":
