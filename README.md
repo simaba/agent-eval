@@ -2,194 +2,222 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![NIST AI RMF](https://img.shields.io/badge/NIST%20AI%20RMF-Informed-0055A4?style=flat-square)](https://airc.nist.gov/home)
-[![Discussions](https://img.shields.io/badge/Discussions-Join-7289da?style=flat-square&logo=github)](https://github.com/simaba/agent-eval/discussions)
 
-A structured framework for evaluating AI agents across task performance, safety, reliability, and governance dimensions, designed for regulated-industry deployment.
+A practitioner framework for designing, recording, and reviewing agent evaluations without collapsing coverage, measurement validity, hard gates, and release judgment into one score.
 
----
+The repository provides a human-readable report template, a machine-readable schema, a semantic validator, fictional examples, and guidance on evaluation validity. It is not a benchmark leaderboard or a source of universal pass thresholds.
 
-## Choose this repo when
+## The central idea
 
-Use this repository when you need **measurement and pass/fail logic** for AI agents:
+An evaluation result is only useful when five things are explicit:
 
-- what to measure
-- which scenarios to test
-- how to score performance, safety, and reliability
-- what should appear in an evaluation report
-- how to structure evaluation evidence for human review and future automation
+1. **the decision it supports** — prototype, compare, pilot, expand, hold, roll back, or retire;
+2. **the operating population it represents** — users, tasks, languages, tools, permissions, and exclusions;
+3. **the measurement instrument** — executable rule, expert review, user outcome, or model judge;
+4. **the uncertainty and coverage limits** — sample size, evaluator error, slice gaps, version drift, and scenario bias;
+5. **the decision semantics** — hard gate, quality threshold, required action, condition, blocker, or accepted residual risk.
 
-Do **not** start here if you need the oversight model. Use [`multi-agent-governance`](https://github.com/simaba/multi-agent-governance).
+Without those elements, a precise-looking score can be less informative than a small set of well-investigated failures.
 
-Do **not** start here if you need orchestration patterns. Use [`agent-orchestration`](https://github.com/simaba/agent-orchestration).
+## Start here
 
-Do **not** start here if you want runnable behavior. Use [`agent-simulator`](https://github.com/simaba/agent-simulator).
-
----
-
-## Maturity
-
-This is a **practitioner evaluation framework**, not a certified benchmark suite. The metrics and targets are intended as starting points for structured evaluation. Real deployments should adapt thresholds to the domain, risk tier, user population, applicable regulation, and operational failure tolerance.
-
----
-
-## Practical artifacts
-
-| Artifact | Use for |
+| Artifact | Use it for |
 |---|---|
-| [`templates/evaluation-report.md`](templates/evaluation-report.md) | Human-readable agent evaluation report |
-| [`examples/sample-evaluation-report.md`](examples/sample-evaluation-report.md) | Filled generic Markdown example |
-| [`schemas/evaluation-report.schema.json`](schemas/evaluation-report.schema.json) | Machine-readable report schema for structured evaluation evidence |
-| [`examples/sample-evaluation-report.json`](examples/sample-evaluation-report.json) | Filled JSON example aligned to the schema |
+| [`docs/evaluation-validity.md`](docs/evaluation-validity.md) | Designing evidence that can support a stated decision |
+| [`docs/decision-semantics.md`](docs/decision-semantics.md) | Keeping risk tier, finding severity, blockers, required actions, conditions, and release decisions distinct |
+| [`templates/evaluation-report.md`](templates/evaluation-report.md) | Human review and sign-off discussion |
+| [`schemas/evaluation-report.schema.json`](schemas/evaluation-report.schema.json) | Machine-readable evaluation records |
+| [`examples/sample-evaluation-report.json`](examples/sample-evaluation-report.json) | Fictional structured example |
+| [`tools/validate_evaluation_report.py`](tools/validate_evaluation_report.py) | Schema and decision-coherence validation |
 
----
+## What the framework evaluates
 
-## Evaluation dimensions
+The dimensions below are categories for designing measurements. They are not automatically valid metrics.
 
-### 1. Task performance
+### Task and outcome performance
 
-| Metric | Description | Measurement Method |
-|---|---|---|
-| **Task Completion Rate** | % of tasks completed without error | automated test suite against benchmark scenarios |
-| **Goal Achievement Rate** | % of tasks where the final goal was met | human or LLM-judge evaluation |
-| **Step Efficiency** | average steps taken vs. optimal path | comparison to expert baseline |
-| **Tool Use Accuracy** | correct tool selection and parameter passing | automated verification |
-| **Output Quality** | correctness and usefulness of agent outputs | rubric-based judging |
+- end-to-end task completion;
+- correctness against a defined reference or acceptance rule;
+- user or workflow outcome;
+- tool selection and parameter accuracy;
+- correction and recovery behavior;
+- unnecessary step or interaction cost.
 
-### 2. Safety and reliability
+### Safety, privacy, and policy behavior
 
-| Metric | Description | Example target |
-|---|---|---|
-| **Hallucination Rate** | factually incorrect statements in outputs | < 2% on factual tasks, adjusted by risk tier |
-| **Harmful Output Rate** | outputs violating safety guidelines | 0% hard limit for critical harms |
-| **Refusal Appropriateness** | correct refusal of inappropriate requests | > 95%, adjusted by policy scope |
-| **Prompt Injection Resistance** | resistance to adversarial inputs | tested via red-team suite |
-| **Consistency** | same input produces the same output class | > 90% across repeated runs, adjusted by task type |
+- prohibited action or tool invocation;
+- sensitive-data exposure or inappropriate retention;
+- refusal, deferral, and escalation at defined boundaries;
+- prompt-injection and untrusted-content handling;
+- behavior under conflicting instructions;
+- containment after a control or dependency failure.
 
-### 3. Operational reliability
+### Operational reliability
 
-| Metric | Description | Example target |
-|---|---|---|
-| **Availability** | uptime under normal and peak load | ≥ 99.5%, adjusted by service criticality |
-| **P99 Latency** | 99th-percentile response time | ≤ configured SLA |
-| **Error Rate** | % of requests ending in unhandled errors | < 0.1%, adjusted by workload |
-| **Cost per Task** | token cost per successful task | tracked against budget |
-| **Graceful Degradation** | behavior when tools or dependencies fail | tested via fault injection |
+- latency and timeout behavior under stated load;
+- unhandled and handled failure rates;
+- retry, fallback, and circuit-breaker behavior;
+- dependency and tool degradation;
+- cost and resource consumption;
+- recovery time and state consistency.
 
-### 4. Governance and auditability
+### Governance and auditability
 
-| Metric | Description | Pass Criterion |
-|---|---|---|
-| **Decision Traceability** | can every output be traced to inputs and decision evidence? | full trace available |
-| **Tool Call Logging** | all external tool calls logged with parameters | 100% logged, with sensitive data controls |
-| **Human Escalation Rate** | % of tasks escalated to human review | tracked with threshold defined |
-| **Sensitive Data Handling** | PII or sensitive data not leaked in outputs or logs | 0 critical violations |
-| **Override Capability** | operator can halt or override agent behavior | verified in testing |
+- decision and tool-call provenance;
+- version and permission traceability;
+- human override and stop mechanisms;
+- evidence retention with privacy controls;
+- owner, review, and residual-risk records;
+- regression triggers after material change.
 
----
+## Metrics need operational definitions
 
-## Evaluation protocol
+Terms such as “hallucination,” “helpfulness,” “safety,” “consistency,” and “quality” are not self-defining.
 
-The target numbers above should not be treated as universal pass/fail thresholds. Use this protocol to make evaluations more defensible.
+For each metric, record:
 
-| Protocol element | Recommended practice |
+| Field | Example question |
 |---|---|
-| Scenario set | Include normal, ambiguous, adversarial, tool-failure, escalation, and out-of-distribution tasks |
-| Sample size | Define the minimum number of tasks per scenario class before testing starts |
-| Risk tiering | Use stricter thresholds for safety-critical, regulated, or irreversible decisions |
-| Repeated runs | Run the same scenario multiple times when model nondeterminism matters |
-| Human adjudication | Use expert review for high-impact failures, disputed LLM-judge results, and policy-boundary cases |
-| Severity levels | Classify findings as minor, major, critical, or blocker |
-| Confidence | Report uncertainty, small sample caveats, and known benchmark limitations |
-| Regression testing | Re-run the suite after model, prompt, tool, retrieval, or policy changes |
-| Evidence retention | Store prompts, inputs, outputs, tool traces, evaluator notes, and sign-off decisions with appropriate data controls |
+| Construct | What property are we trying to understand? |
+| Observable rule | What exactly counts as success or failure? |
+| Unit | Response, task, conversation, tool call, user, or time window? |
+| Denominator | Which attempts are included, excluded, or missing? |
+| Evaluator | Rule, test, expert, user, or model judge? |
+| Instrument error | How can the evaluator itself be wrong? |
+| Decision use | Which action changes if the metric moves? |
 
-### Suggested release decision logic
+Do not reuse a percentage target across systems unless the population, unit, evaluator, severity model, and decision context are comparable.
 
-| Decision | Use when |
+## Evaluation suite design
+
+A credible suite usually separates several purposes:
+
+| Suite | Primary purpose |
 |---|---|
-| **Approve** | No blockers, critical controls pass, residual risks accepted by named owners |
-| **Approve with conditions** | Minor or moderate issues exist but mitigations and monitoring are defined |
-| **Hold** | Major issues require fixes before release |
-| **Reject** | Critical safety, privacy, compliance, or operational failures are unresolved |
+| Operating-distribution sample | Estimate routine performance under stated workload assumptions |
+| Critical-risk suite | Oversample rare, high-consequence conditions and hard gates |
+| Boundary suite | Test ambiguity, refusal, escalation, and policy transitions |
+| Fault-injection suite | Exercise tool, retrieval, network, permission, and state failures |
+| Regression suite | Preserve previously discovered failures and important invariants |
+| Exploratory suite | Discover new slices and failure modes; not used alone for release claims |
 
----
+A balanced challenge set may be good at finding failures but unsuitable for estimating production prevalence. Report coverage and prevalence-weighted performance separately.
 
-## Evaluation scenarios
+## Evaluator hierarchy
 
-### Standard benchmark suite
+Use the simplest evaluator capable of measuring the property.
 
-| Scenario | Description | Difficulty |
-|---|---|---|
-| Single-step task | straightforward, well-defined task | Basic |
-| Multi-step task | sequence of actions with intermediate dependencies | Intermediate |
-| Ambiguous instruction | underspecified request requiring clarification | Intermediate |
-| Tool failure | dependent tool returns an error | Intermediate |
-| Adversarial input | prompt injection or manipulation attempt | Advanced |
-| Novel situation | task outside the usual distribution | Advanced |
-| Cascading failure | multiple dependencies fail in sequence | Advanced |
-| Human escalation | agent should recognize the need to escalate | Advanced |
+1. **Executable checks** for directly observable invariants such as schema validity, unauthorized tool use, state mutation, citation presence, or timeout behavior.
+2. **Qualified human review** for domain judgment, consequential ambiguity, and disputed failures.
+3. **Model judges** for scalable rubric application only after calibration against representative human review and explicit testing for order, style, self-preference, and verbosity effects.
 
-### Regulated-industry scenarios
+A model-judge result is an instrument reading, not ground truth. Record the judge model, prompt, configuration, version, agreement, and adjudication process.
 
-| Industry | Scenario | Key Evaluation Criteria |
-|---|---|---|
-| Healthcare | clinical documentation assistant | factual accuracy, refusal quality, low hallucination |
-| Finance | transaction-analysis agent | compliance, auditability, no PII leakage |
-| Insurance | claims-assessment agent | fairness, traceability, escalation quality |
-| Legal | contract-review agent | citation accuracy, scope awareness, human escalation |
+## Repeated runs and uncertainty
 
----
+For nondeterministic systems, report:
 
-## Human-readable report template
+- attempts per scenario;
+- run and seed policy where applicable;
+- model, prompt, retrieval, tool, permission, and environment versions;
+- missing or failed runs;
+- scenario-level recurrence and variability;
+- uncertainty intervals for estimated rates or means;
+- coverage gaps and evaluator limitations that statistical intervals do not capture.
 
-Use [`templates/evaluation-report.md`](templates/evaluation-report.md) for review meetings, sign-off packs, and stakeholder alignment.
+“Zero observed failures” must include the number of opportunities and a plain-language limit. Zero failures in a small sample is not evidence of zero risk.
 
-## Machine-readable report schema
+## Slice analysis
 
-Use [`schemas/evaluation-report.schema.json`](schemas/evaluation-report.schema.json) when you want evaluation results to be structured for later validation, CI checks, dashboards, or trend analysis.
+Predefine decision-relevant slices such as:
 
-The schema captures:
+- language or locale;
+- task and user type;
+- ambiguity level;
+- tool authority and permission scope;
+- data sensitivity;
+- retrieval quality;
+- accessibility need;
+- dependency failure mode;
+- safety or policy boundary.
 
-- metadata
-- recommendation and blockers
-- scope
-- scenarios
-- scorecard results
-- findings
-- oversight triggers
-- release decision and sign-off
+Exploratory slicing can discover problems, but a post-hoc search across many slices should not be presented as confirmatory evidence without disclosure and follow-up testing.
 
----
+## Threshold and gate design
 
-## NIST AI RMF mapping
+This repository intentionally does not prescribe universal values such as a fixed hallucination rate, refusal rate, availability target, or latency objective.
 
-Full mapping: [docs/nist-rmf-mapping.md](docs/nist-rmf-mapping.md)
+A threshold should record:
 
-Key practitioner mapping:
+- decision owner and intended decision;
+- baseline or comparator;
+- affected population and harm model;
+- measurement method and uncertainty;
+- minimum sample and slice coverage;
+- non-compensable hard gates;
+- quality or operational targets that may be optimized;
+- exception and residual-risk process;
+- expiry or review trigger.
 
-- **MS.1**: AI risk identification through safety and adversarial scenarios
-- **MS.3**: structured evaluation techniques and benchmark design
-- **MS.5**: subgroup and fairness measurement
-- **GV.4**: human oversight via escalation and override checks
+A weighted aggregate must never hide a failed hard gate or an unresolved critical finding.
 
----
+## Decision semantics
 
-## Scope and disclaimer
+The schema and validator keep these concepts separate:
 
-This repository is shared in a personal capacity. It is not legal advice, compliance certification, regulatory approval, safety certification, benchmark certification, or official guidance from NIST, the EU, ISO, or any employer.
+| Concept | Meaning |
+|---|---|
+| System risk tier | impact context for the evaluated system and use case |
+| Scenario / finding severity | consequence of a specific failure |
+| Blocker | unresolved condition that prevents the current decision |
+| Required action | follow-up work accepted under a bounded conditional decision |
+| Condition | explicit constraint attached to that decision |
+| Residual risk | remaining uncertainty or harm accepted by a named authority |
 
-References to NIST AI RMF, EU AI Act, safety controls, or industry obligations are practitioner mappings and examples. Always verify against official sources before using this framework for compliance, safety, or release decisions.
+See [`docs/decision-semantics.md`](docs/decision-semantics.md) for the validator rules.
 
----
+## Validation
+
+The validator checks schema conformance and selected decision coherence:
+
+```bash
+python tools/validate_evaluation_report.py \
+  schemas/evaluation-report.schema.json \
+  examples/sample-evaluation-report.json
+```
+
+It can catch contradictions such as an unconditional release with unresolved blockers. It cannot determine whether the benchmark is representative, the evaluator is valid, the threshold is justified, or the residual risk is acceptable.
+
+## Failure review
+
+Do not stop at the scorecard. For material failures, preserve:
+
+- scenario and run identifiers;
+- relevant input, context, and tool trace;
+- evaluator result and disagreement;
+- severity rationale;
+- containment and remediation;
+- root-cause hypothesis versus confirmed cause;
+- regression test created;
+- owner and disposition.
+
+The failure corpus often becomes more valuable than the original aggregate score.
+
+## Maturity and scope
+
+This is a practitioner evaluation framework with working schema and semantic validation. It is useful for structured reviews, evaluation-plan design, fictional examples, and future automation. It is not a certified benchmark, safety case, regulatory assessment, or substitute for qualified domain, security, privacy, legal, compliance, or release authority.
+
+References to NIST AI RMF or regulated-industry concerns are practitioner mappings. Verify official sources and adapt the framework to the actual system, population, jurisdiction, and failure tolerance.
 
 ## Related repositories
 
-| Repository | What it adds |
+| Repository | Distinct role |
 |---|---|
-| [`multi-agent-governance`](https://github.com/simaba/multi-agent-governance) | oversight model, trust structure, accountability controls |
-| [`agent-orchestration`](https://github.com/simaba/agent-orchestration) | control-flow patterns and orchestration logic |
-| [`agent-simulator`](https://github.com/simaba/agent-simulator) | runnable execution and failure-mode examples |
-| [`nist-rmf-guide`](https://github.com/simaba/nist-rmf-guide) | practitioner guide for broader RMF implementation |
-| [`governance-playbook`](https://github.com/simaba/governance-playbook) | enterprise operating model beyond agent evaluation |
+| [`agent-simulator`](https://github.com/simaba/agent-simulator) | runnable bounded-agent behavior and failure paths |
+| [`agent-orchestration`](https://github.com/simaba/agent-orchestration) | control-flow patterns |
+| [`multi-agent-governance`](https://github.com/simaba/multi-agent-governance) | authority, oversight, containment, and accountability |
+| [`automotive-llm-eval-harness`](https://github.com/simaba/automotive-llm-eval-harness) | compact scorer for synthetic automotive evaluation artifacts |
 
-*Maintained by [Sima Bagheri](https://github.com/simaba) · Connect on [LinkedIn](https://www.linkedin.com/in/simaba/)*
+---
+
+*Maintained by [Sima Bagheri](https://github.com/simaba).*
